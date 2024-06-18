@@ -32,6 +32,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.diffplug.spotless:spotless-plugin-gradle:6.25.0")
+    implementation("org.apache.commons:commons-csv:1.11.0")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.h2database:h2")
