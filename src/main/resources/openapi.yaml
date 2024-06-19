@@ -1,156 +1,56 @@
 # Ref. https://swagger.io/specification/
 openapi: '3.0.3'
 info:
-  title: '3o3'
+  title: 'task'
   version: 'automatically set by codes'
+servers:
+  - url: 'http://localhost:8080'
+    description: 'Local'
 paths:
-  '/szs/signup':
-    post:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - userId
-                - password
-                - name
-                - regNo
-              properties:
-                userId:
-                  type: string
-                  nullable: false
-                  example: "kw68"
-                password:
-                  type: string
-                  nullable: false
-                  example: "123456"
-                name:
-                  type: string
-                  nullable: false
-                  example: "관우"
-                regNo:
-                  type: string
-                  nullable: false
-                  example: "681108-1582816"
-      responses:
-        204:
-          description: 'Register success no content'
-        403:
-          description: 'Forbidden'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                NOT_AGREED_TO_JOIN:
-                  $ref: '#/components/examples/NOT_AGREED_TO_JOIN'
-        409:
-          description: 'Conflict'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                ALREADY_EXISTING_USER_ID:
-                  $ref: '#/components/examples/ALREADY_EXISTING_USER_ID'
-  '/szs/login':
-    post:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - userId
-                - password
-              properties:
-                userId:
-                  type: string
-                  nullable: false
-                  example: "kw68"
-                password:
-                  type: string
-                  nullable: false
-                  example: "123456"
-      responses:
-        200:
-          description: 'Login success'
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - userId
-                  - name
-                  - accessToken
-                properties:
-                  userId:
-                    type: string
-                    example: "kw68"
-                    nullable: false
-                  name:
-                    type: string
-                    example: "관우"
-                    nullable: false
-                  accessToken:
-                    type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJrdzY4IiwiaWF0IjoxNjY5MjIwNjY9.1ed..."
-        '404':
-          description: 'Not Found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                NOT_FOUND_CUSTOMER:
-                  $ref: '#/components/examples/NOT_FOUND_CUSTOMER'
-  '/szs/scrap':
-    post:
-      description: 'Scrap user info and save'
-      security:
-        - Authorization: []
-      responses:
-        204:
-          description: 'Success save no content'
-        404:
-          description: 'Not Found'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                NOT_FOUND_CUSTOMER:
-                  $ref: '#/components/examples/NOT_FOUND_CUSTOMER'
-        502:
-          description: 'Bad Gateway'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                UNAVAILABLE_EXTERNAL_SCRAPPING_SERVER:
-                  $ref: '#/components/examples/UNAVAILABLE_EXTERNAL_SCRAPPING_SERVER'
-  '/szs/refund':
+  '/api/employee':
     get:
       description: 'Get refund info'
-      security:
-        - Authorization: []
       responses:
         200:
           description: 'Success get tax refund amount'
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - 결정세액
-                  - 년도
-                properties:
-                  결정세액:
-                    type: string
-                    example: "150,000"
-                    nullable: false
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+    post:
+      description: 'Bulk save employee by csv or json file'
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        201:
+          description: 'Success save employees'
+  '/api/employee/{name}':
+    get:
+      description: 'Get employee info by name'
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '김철수'
+      responses:
+        200:
+          description: 'Success get employee info'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
         404:
           description: 'Not Found'
           content:
@@ -158,11 +58,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
               examples:
-                NOT_FOUND_SCRAPPED_TAX_DEDUCTION:
-                  $ref: '#/components/examples/NOT_FOUND_SCRAPPED_TAX_DEDUCTION'
-                NOT_FOUND_CUSTOMER:
-                  $ref: '#/components/examples/NOT_FOUND_CUSTOMER'
-
+                NOT_FOUND_EMPLOYEE:
+                  $ref: '#/components/examples/NOT_FOUND_EMPLOYEE'
 components:
   schemas:
     Error:
@@ -171,29 +68,27 @@ components:
         errorMessage:
           type: string
           description: 'Error message'
-  securitySchemes:
-    Authorization:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    Employee:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: false
+          example: 김철수
+        email:
+          type: string
+          nullable: false
+          example: qweon@naver.com
+        tel:
+          type: string
+          nullable: false
+          example: 010-1111-2222
+        joined:
+          type: string
+          nullable: false
+          format: date
+          example: '2024-05-18'
   examples:
-    NOT_FOUND_CUSTOMER:
+    NOT_FOUND_EMPLOYEE:
       value:
         errorMessage: '회원을 찾을수 없습니다.'
-    WRONG_PASSWORD:
-      value:
-        errorMessage: '비밀번호가 틀렸습니다.'
-    ALREADY_EXISTING_USER_ID:
-      value:
-        errorMessage: '이미 존재하는 유저 아이디입니다.'
-    NOT_AGREED_TO_JOIN:
-      value:
-        errorMessage: '가입 동의를 하지 않았습니다.'
-    NOT_FOUND_SCRAPPED_TAX_DEDUCTION:
-      value:
-        errorMessage: '스크래핑된 소득 정보가 없습니다.'
-    UNAVAILABLE_EXTERNAL_SCRAPPING_SERVER:
-      value:
-        errorMessage: '스크래핑 서버가 현재 이용 불가능합니다.'
-security:
-  - Authorization: []
