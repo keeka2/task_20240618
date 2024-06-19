@@ -1,10 +1,12 @@
 package com.example.sos.employee;
 
+import com.example.sos.employee.error.AlreadyExistEmployeeError;
 import com.example.sos.employee.error.InvalidUploadFormatError;
 import com.example.sos.employee.error.NotFoundEmployeeError;
 import com.example.sos.employee.model.Employee;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,9 +40,12 @@ public class EmployeeServiceImpl implements EmployeeService {
                 final List<Employee> employees = this.parseCsvEmployees(uploadEmployeeRequest);
                 this.employeeRepository.saveAll(employees);
             } else {
-                throw new IllegalArgumentException("Unsupported format");
+                throw new InvalidUploadFormatError();
             }
-        } catch (IOException e) {
+        } catch (DataIntegrityViolationException e) {
+            throw new AlreadyExistEmployeeError();
+        }
+        catch (IOException e) {
             throw new InvalidUploadFormatError();
         }
     }

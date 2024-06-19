@@ -4,7 +4,6 @@ import lombok.NonNull;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public class DateTimeUtil {
     private static final DateTimeFormatter POINT_DATE_TIME_FORMATTER= DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");

@@ -1,3 +1,5 @@
 package com.example.sos.employee.error;
 
-public class InvalidUploadFormatError extends RuntimeException {}
+import com.example.sos.common.error.BaseError;
+
+public class InvalidUploadFormatError extends BaseError {}

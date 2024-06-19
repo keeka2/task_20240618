@@ -24,6 +24,15 @@ paths:
       requestBody:
         required: true
         content:
+          text/plain:
+            schema:
+              type: string
+              example: |
+                [
+                {"name": "이무기", "email": "weapon@clovf.com", "tel": "010-1111-2424", "joined": "2020-01-05"},
+                {"name": "판브이", "email": "panv@clovf.com", "tel": "010-3535-7979", "joined": "2013-07-01"},
+                {"name": "차호빵", "email": "hobread@clovf.com", "tel": "010-8531-7942", "joined": "2019-12-05"}
+                ]
           application/octet-stream:
             schema:
               type: object
@@ -34,6 +43,24 @@ paths:
       responses:
         201:
           description: 'Success save employees'
+        400:
+          description: 'Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                INVALID_UPLOAD_FORMAT:
+                  $ref: '#/components/examples/INVALID_UPLOAD_FORMAT'
+        409:
+          description: 'Conflict'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                ALREADY_EXIST_EMPLOYEE:
+                  $ref: '#/components/examples/ALREADY_EXIST_EMPLOYEE'
   '/api/employee/{name}':
     get:
       description: 'Get employee info by name'
@@ -91,4 +118,10 @@ components:
   examples:
     NOT_FOUND_EMPLOYEE:
       value:
-        errorMessage: '회원을 찾을수 없습니다.'
+        errorMessage: '직원을 찾을수 없습니다.'
+    INVALID_UPLOAD_FORMAT:
+      value:
+        errorMessage: '지원하지 않는 파일 형식입니다.'
+    ALREADY_EXIST_EMPLOYEE:
+      value:
+        errorMessage: '이미 존재하는 직원이 있습니다.'
