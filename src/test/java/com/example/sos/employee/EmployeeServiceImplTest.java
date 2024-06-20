@@ -74,7 +74,7 @@ class EmployeeServiceImplTest{
         final Employee employee = this.employeeService.getEmployeeByName("이무기");
         assertEquals("이무기", employee.getName());
         assertEquals("weapon@clovf.com", employee.getEmail());
-        assertEquals("010-1111-2424", employee.getTel());
+        assertEquals("01011112424", employee.getTel());
         assertEquals("2020-01-05T00:00", employee.getJoined().toString());
     }
 }

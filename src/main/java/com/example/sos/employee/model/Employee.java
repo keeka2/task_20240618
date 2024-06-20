@@ -48,7 +48,7 @@ public class Employee {
         return Employee.builder()
                 .name(employeeJsonRequest.getName())
                 .email(employeeJsonRequest.getEmail())
-                .tel(employeeJsonRequest.getTel())
+                .tel(employeeJsonRequest.getTel().replaceAll("-", ""))
                 .joined(DateTimeUtil.parseSlashDateTime(employeeJsonRequest.getJoined()))
                 .build();
     }

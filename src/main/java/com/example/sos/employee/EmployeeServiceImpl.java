@@ -80,11 +80,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employees;
     }
 
-    private boolean isJsonFormat(@NonNull final String content) {
-        return content.startsWith("[");
+    private boolean isJsonFormat(@NonNull final String firstLine) {
+        return firstLine.startsWith("[");
     }
 
-    private boolean isCSVFormat(@NonNull final String line) {
-        return line.contains(",");
+    private boolean isCSVFormat(@NonNull final String firstLine) {
+        return firstLine.contains(",");
     }
 }

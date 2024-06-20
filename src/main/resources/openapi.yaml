@@ -70,7 +70,7 @@ paths:
           required: true
           schema:
             type: string
-          example: '김철수'
+          example: '이무기'
       responses:
         200:
           description: 'Success get employee info'
@@ -98,23 +98,27 @@ components:
     Employee:
       type: object
       properties:
+        id:
+          type: integer
+          nullable: false
+          example: 1
         name:
           type: string
           nullable: false
-          example: 김철수
+          example: 이무기
         email:
           type: string
           nullable: false
-          example: qweon@naver.com
+          example: weapon@clovf.com
         tel:
           type: string
           nullable: false
-          example: 010-1111-2222
+          example: 01011112424
         joined:
           type: string
           nullable: false
-          format: date
-          example: '2024-05-18'
+          format: datetime
+          example: '2020-01-05T00:00:00'
   examples:
     NOT_FOUND_EMPLOYEE:
       value:

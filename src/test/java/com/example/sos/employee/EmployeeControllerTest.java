@@ -41,7 +41,7 @@ public class EmployeeControllerTest {
                                 .id(1L)
                                 .name("jsk")
                                 .email("dwkmd@demk.com")
-                                .tel("010-1234-5678")
+                                .tel("01012345678")
                                 .joined(LocalDateTime.of(2021, 1, 1, 0, 0))
                                 .build()
                 ));
@@ -51,7 +51,7 @@ public class EmployeeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("jsk"))
                 .andExpect(jsonPath("$[0].email").value("dwkmd@demk.com"))
-                .andExpect(jsonPath("$[0].tel").value("010-1234-5678"))
+                .andExpect(jsonPath("$[0].tel").value("01012345678"))
                 .andExpect(jsonPath("$[0].joined").value("2021-01-01T00:00:00"));
     }
 
@@ -99,7 +99,7 @@ public class EmployeeControllerTest {
                         .id(1L)
                         .name("jsk")
                         .email("dwkmd@demk.com")
-                        .tel("010-1234-5678")
+                        .tel("01012345678")
                         .joined(LocalDateTime.of(2021, 1, 1, 0, 0))
                         .build());
         this.mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/jsk")
@@ -107,7 +107,9 @@ public class EmployeeControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("jsk"))
-                .andExpect(jsonPath("$.email").value("dwkmd@demk.com"));
+                .andExpect(jsonPath("$.email").value("dwkmd@demk.com"))
+                .andExpect(jsonPath("$.tel").value("01012345678"))
+                .andExpect(jsonPath("$.joined").value("2021-01-01T00:00:00"));
     }
 
     @Test
