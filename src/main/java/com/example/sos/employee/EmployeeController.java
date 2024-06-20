@@ -22,8 +22,8 @@ public class EmployeeController {
     }
 
     @GetMapping(path = "/api/employee")
-    public ResponseEntity<List<Employee>> getEmployees() {
-        final List<Employee> employees = this.employeeService.getEmployees();
+    public ResponseEntity<List<Employee>> getEmployees(@RequestParam(required = false, defaultValue = "1") int page) {
+        final List<Employee> employees = this.employeeService.getEmployees(page);
         return ResponseEntity.ok(employees);
     }
 

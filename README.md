@@ -16,8 +16,15 @@
 ## 구현 범위
 - API 명세 (resources/openapi.yaml 참조)
     - Openapi 스펙 링크: http://127.0.0.1:8080/test/swagger.html
+- API 구현
+    - GET /api/employee
+        - 테스트 데이터 조회
+    - POST /api/employee
+        - 테스트 데이터 생성
+    - GET /api/employee/{name}
+        - 테스트 데이터 수정
 - 테스트 코드
-    - Controller, Service, Util 등의 테스트 코드 작성 (예정)
+    - Controller, Service, Util 등의 테스트 코드 작성
 # 코드 빌드, 테스트, 실행 방법
 ## 코드 빌드 및 서버 실행 방법 (Docker)
 ```sh

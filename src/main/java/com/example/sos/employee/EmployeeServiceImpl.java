@@ -8,6 +8,9 @@ import com.example.sos.employee.model.Employee;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,12 +21,15 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
+    private static final int PAGE_SIZE = 20;
     private final EmployeeRepository employeeRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public List<Employee> getEmployees() {
-        return this.employeeRepository.findAll();
+    public List<Employee> getEmployees(final int page) {
+        final Pageable pageable = PageRequest.of(page - 1, PAGE_SIZE);
+        final Page<Employee> pageableEmployee = this.employeeRepository.findAll(pageable);
+        return pageableEmployee.getContent();
     }
 
     @Override
