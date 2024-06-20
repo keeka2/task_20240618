@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@Slf4j
 public class FileUtil {
     @NonNull
     public static InputStream getResourceInputStream(@NonNull final String filePath) {

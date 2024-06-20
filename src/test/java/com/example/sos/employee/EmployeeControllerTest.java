@@ -2,8 +2,11 @@ package com.example.sos.employee;
 
 
 import com.example.sos.common.util.FileUtil;
+import com.example.sos.employee.error.AlreadyExistEmployeeError;
+import com.example.sos.employee.error.EmployeeErrorConst;
+import com.example.sos.employee.error.InvalidUploadFormatError;
+import com.example.sos.employee.error.NotFoundEmployeeError;
 import com.example.sos.employee.model.Employee;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,8 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -28,8 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class EmployeeControllerTest {
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
     @MockBean
     private EmployeeService employeeService;
 
@@ -69,6 +69,30 @@ public class EmployeeControllerTest {
     }
 
     @Test
+    void postEmployeesWithInvalidFormat() throws Exception {
+        final String invalidFormat = "invalidFormat";
+        byte[] byteArray = invalidFormat.getBytes();
+        willThrow(new InvalidUploadFormatError()).given(employeeService).uploadEmployeeData(byteArray);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/employee")
+                        .content(byteArray))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorMessage").value(EmployeeErrorConst.INVALID_UPLOAD_FORMAT_ERROR_MESSAGE));
+    }
+
+    @Test
+    void postEmployeesWithAlreadyExistingEmployee() throws Exception {
+        final String invalidFormat = "alreadyExistingEmployee";
+        byte[] byteArray = invalidFormat.getBytes();
+        willThrow(new AlreadyExistEmployeeError()).given(employeeService).uploadEmployeeData(byteArray);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/employee")
+                        .content(byteArray))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.errorMessage").value(EmployeeErrorConst.ALREADY_EXIST_EMPLOYEE_ERROR_MESSAGE));
+    }
+
+    @Test
     void getEmployeeByName() throws Exception {
         given(this.employeeService.getEmployeeByName("jsk")).willReturn(
                 Employee.builder()
@@ -84,5 +108,15 @@ public class EmployeeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("jsk"))
                 .andExpect(jsonPath("$.email").value("dwkmd@demk.com"));
+    }
+
+    @Test
+    void getEmployeeByNameThrowNotFoundEmployee() throws Exception {
+        given(this.employeeService.getEmployeeByName("jsk")).willThrow(new NotFoundEmployeeError());
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/employee/jsk")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errorMessage").value(EmployeeErrorConst.NOT_FOUND_EMPLOYEE_ERROR_MESSAGE));
     }
 }

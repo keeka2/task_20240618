@@ -1,5 +1,6 @@
 package com.example.sos.employee;
 
+import com.example.sos.common.util.IoUtil;
 import com.example.sos.employee.error.AlreadyExistEmployeeError;
 import com.example.sos.employee.error.InvalidUploadFormatError;
 import com.example.sos.employee.error.NotFoundEmployeeError;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,23 +30,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     public void uploadEmployeeData(final byte[] uploadEmployeeRequest) {
         try {
-            final String firstLine = this.getFirstLine(uploadEmployeeRequest);
-            if (this.isJsonFormat(firstLine)) {
-                //JSON
-                final List<Employee> employees = this.parseJsonEmployees(uploadEmployeeRequest);
-                this.employeeRepository.saveAll(employees);
-            } else if (this.isCSVFormat(firstLine)) {
-                // CSV
-                final List<Employee> employees = this.parseCsvEmployees(uploadEmployeeRequest);
-                this.employeeRepository.saveAll(employees);
-            } else {
-                throw new InvalidUploadFormatError();
-            }
+            final List<Employee> employees = this.parseEmployees(uploadEmployeeRequest);
+            this.employeeRepository.saveAll(employees);
         } catch (DataIntegrityViolationException e) {
             throw new AlreadyExistEmployeeError();
-        }
-        catch (IOException e) {
-            throw new InvalidUploadFormatError();
         }
     }
 
@@ -57,38 +44,40 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .orElseThrow(NotFoundEmployeeError::new);
     }
 
-    private List<Employee> parseCsvEmployees(final byte[] uploadEmployeeRequest) throws IOException{
-        final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(uploadEmployeeRequest);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(byteArrayInputStream, StandardCharsets.UTF_8))) {
-            String line;
-            List<Employee> employees = new ArrayList<>();
-            while ((line = reader.readLine()) != null) {
-                employees.add(Employee.fromCsv(line));
+    private List<Employee> parseEmployees(final byte[] uploadEmployeeRequest) {
+        try (final BufferedReader reader = IoUtil.createBufferedReader(uploadEmployeeRequest)) {
+            final String firstLine = reader.readLine();
+            if (this.isJsonFormat(firstLine)) {
+                return parseJsonEmployees(reader);
+            } else if (this.isCSVFormat(firstLine)) {
+                return parseCsvEmployees(reader, firstLine);
             }
-            return employees;
+            throw new InvalidUploadFormatError();
+        } catch (IOException e) {
+            throw new InvalidUploadFormatError();
         }
     }
 
-    private List<Employee> parseJsonEmployees(final byte[] uploadEmployeeRequest) throws IOException {
-        final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(uploadEmployeeRequest);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(byteArrayInputStream, StandardCharsets.UTF_8))) {
-            String line;
-            final List<Employee> employees = new ArrayList<>();
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("[") || line.startsWith("]")) {
-                    continue;
-                }
-                employees.add(Employee.fromJson(line.strip().replaceAll(",$", "")));
-            }
-            return employees;
+    private List<Employee> parseCsvEmployees(final BufferedReader reader, final String firstLine) throws IOException{
+        String line;
+        final List<Employee> employees = new ArrayList<>();
+        employees.add(Employee.fromCsv(firstLine));
+        while ((line = reader.readLine()) != null) {
+            employees.add(Employee.fromCsv(line));
         }
+        return employees;
     }
 
-    private String getFirstLine(final byte[] uploadEmployeeRequest) throws IOException {
-        final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(uploadEmployeeRequest);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(byteArrayInputStream, StandardCharsets.UTF_8))) {
-            return reader.readLine();
+    private List<Employee> parseJsonEmployees(final BufferedReader reader) throws IOException {
+        String line;
+        final List<Employee> employees = new ArrayList<>();
+        while ((line = reader.readLine()) != null) {
+            if (line.startsWith("[") || line.startsWith("]")) {
+                continue;
+            }
+            employees.add(Employee.fromJson(line.strip().replaceAll(",$", "")));
         }
+        return employees;
     }
 
     private boolean isJsonFormat(@NonNull final String content) {

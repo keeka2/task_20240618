@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
-@CrossOrigin("*")
+@CrossOrigin("*")  // 스웨거 테스트 위해 CORS 허용
 @RestController
 @RequiredArgsConstructor
 public class EmployeeController {

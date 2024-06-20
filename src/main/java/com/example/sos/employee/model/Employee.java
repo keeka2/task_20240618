@@ -32,8 +32,8 @@ public class Employee {
     @NonNull private String tel;
     @NonNull private LocalDateTime joined;
 
-    public static Employee fromCsv(String line) {
-        String[] values = line.split(",");
+    public static Employee fromCsv(final String line) {
+        final String[] values = line.split(",");
         return Employee.builder()
                 .name(values[0])
                 .email(values[1])
@@ -42,9 +42,9 @@ public class Employee {
                 .build();
     }
 
-    public static Employee fromJson(String line) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        EmployeeJsonRequest employeeJsonRequest = objectMapper.readValue(line, EmployeeJsonRequest.class);
+    public static Employee fromJson(final String line) throws JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final EmployeeJsonRequest employeeJsonRequest = objectMapper.readValue(line, EmployeeJsonRequest.class);
         return Employee.builder()
                 .name(employeeJsonRequest.getName())
                 .email(employeeJsonRequest.getEmail())
