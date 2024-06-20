@@ -1,1 +1,1 @@
-rootProject.name = "sos"
+rootProject.name = "olc"

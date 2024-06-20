@@ -29,6 +29,9 @@
     - GET /api/employee/{name}
         - employee 이름으로 조회
         - name 은 DB 에 unique 로 설정
+- 예외 처리
+    - @ControllerAdvice, @ExceptionHandler 를 통한 예외 처리
+    - 각 상황별 에러 메시지 및 상태 코드 응답
 - 테스트 코드
     - Controller, Service, Util 등의 테스트 코드 작성
 # 코드 빌드, 실행 방법
@@ -44,6 +47,7 @@ docker run -p 8080:8080 jsk-test
 특이사항
 - csv, json body 업로드: text/plain 선택
 - csv, json 파일 업로드: application/octet-stream 선택 (스웨거에서는 파일 불러와서 보낼때 약간 느려 아래 같은 curl 사용 가능)
+  - test 파일은 https://github.com/keeka2/task_20240618/tree/main/src/test/resources/sample 에서 확인 가능
 ```sh
 curl 'http://localhost:8080/api/employee' \
 -X 'POST' \
